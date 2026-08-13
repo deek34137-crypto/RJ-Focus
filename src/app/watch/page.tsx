@@ -56,8 +56,7 @@ function YouTubePlayer({ videoId, listId }: { videoId: string | null, listId: st
         playerVars.list = listId;
       }
 
-      playerRef.current = new window.YT.Player(targetDiv, {
-        videoId: videoId || undefined,
+      const playerOptions: any = {
         host,
         playerVars,
         events: {
@@ -69,7 +68,13 @@ function YouTubePlayer({ videoId, listId }: { videoId: string | null, listId: st
             }
           },
         },
-      });
+      };
+
+      if (videoId) {
+        playerOptions.videoId = videoId;
+      }
+
+      playerRef.current = new window.YT.Player(targetDiv, playerOptions);
     };
 
     if (window.YT && window.YT.Player) {
