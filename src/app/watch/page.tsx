@@ -3,6 +3,7 @@
 import { Suspense, useEffect, useState, useRef } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useSearchStore } from '@/stores/searchStore';
+import PlaylistSidebar from '@/components/watch/PlaylistSidebar';
 import styles from './watch.module.css';
 
 declare global {
@@ -132,6 +133,12 @@ function WatchContent() {
     }
   };
 
+  const handleSelectPlaylistVideo = (selectedVideoId: string) => {
+    if (listId) {
+      router.push(`/watch?v=${selectedVideoId}&list=${listId}&index=${index}`);
+    }
+  };
+
   return (
     <main className={styles.main}>
       <div className={styles.topBar}>
@@ -145,31 +152,43 @@ function WatchContent() {
         )}
       </div>
 
-      <div className={styles.playerContainer}>
-        <YouTubePlayer videoId={videoId} listId={listId} />
-      </div>
+      <div className={`${styles.contentLayout} ${listId ? styles.withSidebar : ''}`}>
+        <div className={styles.mainColumn}>
+          <div className={styles.playerContainer}>
+            <YouTubePlayer videoId={videoId} listId={listId} />
+          </div>
 
-      <div className={styles.controls}>
-        <button 
-          onClick={handlePrev} 
-          disabled={!currentSession || index <= 0}
-          className={styles.navBtn}
-        >
-          Previous
-        </button>
-        
-        <div className={styles.videoInfo}>
-          <h2>{currentVideo?.title || 'Loading...'}</h2>
-          <p>{currentVideo?.channelName}</p>
+          <div className={styles.controls}>
+            <button 
+              onClick={handlePrev} 
+              disabled={!currentSession || index <= 0}
+              className={styles.navBtn}
+            >
+              Previous
+            </button>
+            
+            <div className={styles.videoInfo}>
+              <h2>{currentVideo?.title || (listId ? 'Playlist Video' : 'Loading...')}</h2>
+              <p>{currentVideo?.channelName}</p>
+            </div>
+
+            <button 
+              onClick={handleNext} 
+              disabled={!currentSession || index >= (currentSession?.results?.length || 0) - 1}
+              className={styles.navBtn}
+            >
+              Next
+            </button>
+          </div>
         </div>
-
-        <button 
-          onClick={handleNext} 
-          disabled={!currentSession || index >= currentSession.results.length - 1}
-          className={styles.navBtn}
-        >
-          Next
-        </button>
+        
+        {listId && (
+          <PlaylistSidebar 
+            listId={listId} 
+            currentVideoId={videoId} 
+            onSelectVideo={handleSelectPlaylistVideo} 
+          />
+        )}
       </div>
     </main>
   );

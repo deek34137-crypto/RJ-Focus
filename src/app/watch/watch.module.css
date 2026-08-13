@@ -1,8 +1,8 @@
 .main {
-  max-width: 1200px;
+  max-width: 1600px;
   margin: 0 auto;
-  padding: 1rem 2rem;
-  min-height: 100vh;
+  padding: 1.5rem 2rem;
+  min-height: calc(100vh - 64px);
   display: flex;
   flex-direction: column;
 }
@@ -12,17 +12,20 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1.5rem;
-  padding: 1rem 0;
 }
 
 .backBtn {
   color: var(--text-secondary);
   font-size: 0.9rem;
   transition: color 0.2s;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
 }
 
 .backBtn:hover {
-  color: var(--text-primary);
+  color: var(--foreground);
 }
 
 .sessionInfo {
@@ -31,60 +34,77 @@
 }
 
 .sessionInfo strong {
-  color: var(--text-primary);
+  color: var(--foreground);
+}
+
+.contentLayout {
+  display: grid;
+  gap: 2rem;
+  align-items: start;
+}
+
+.contentLayout.withSidebar {
+  grid-template-columns: 1fr 400px;
+}
+
+.mainColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
 .playerContainer {
   width: 100%;
   aspect-ratio: 16 / 9;
   background-color: #000;
-  border-radius: 8px;
+  border-radius: 12px;
   overflow: hidden;
-  margin-bottom: 2rem;
   box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-}
-
-.iframe {
-  width: 100%;
-  height: 100%;
-  border: none;
 }
 
 .controls {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   background-color: var(--surface);
   padding: 1.5rem;
-  border-radius: 8px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .videoInfo {
-  text-align: center;
+  text-align: left;
   flex: 1;
+  padding: 0 1.5rem;
 }
 
 .videoInfo h2 {
-  font-size: 1.2rem;
-  margin-bottom: 0.2rem;
+  font-size: 1.25rem;
+  margin: 0 0 0.5rem 0;
+  color: var(--foreground);
+  line-height: 1.4;
 }
 
 .videoInfo p {
   color: var(--text-secondary);
-  font-size: 0.9rem;
+  font-size: 0.95rem;
+  margin: 0;
 }
 
 .navBtn {
-  padding: 0.8rem 1.5rem;
+  padding: 0.75rem 1.25rem;
   background-color: var(--surface-elevated);
-  border-radius: 6px;
-  color: var(--text-primary);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--foreground);
   font-weight: 500;
-  transition: background-color 0.2s;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .navBtn:hover:not(:disabled) {
-  background-color: var(--border);
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
 .navBtn:disabled {
@@ -95,6 +115,6 @@
 .error {
   padding: 4rem;
   text-align: center;
-  color: var(--danger);
+  color: #ef4444;
   font-size: 1.2rem;
 }
