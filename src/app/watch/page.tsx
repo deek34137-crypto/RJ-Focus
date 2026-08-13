@@ -12,17 +12,17 @@ declare global {
   }
 }
 
-function YouTubePlayer({ videoId }: { videoId: string }) {
+function YouTubePlayer({ videoId, listId }: { videoId: string | null, listId: string | null }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<any>(null);
   const [useFallback, setUseFallback] = useState(false);
 
   useEffect(() => {
     setUseFallback(false);
-  }, [videoId]);
+  }, [videoId, listId]);
 
   useEffect(() => {
-    if (!videoId) return;
+    if (!videoId && !listId) return;
 
     let script = document.getElementById('youtube-iframe-api') as HTMLScriptElement;
     if (!script) {
@@ -46,13 +46,20 @@ function YouTubePlayer({ videoId }: { videoId: string }) {
       containerRef.current.innerHTML = '';
       containerRef.current.appendChild(targetDiv);
 
+      const playerVars: any = {
+        autoplay: 1,
+        rel: 0,
+      };
+
+      if (listId) {
+        playerVars.listType = 'playlist';
+        playerVars.list = listId;
+      }
+
       playerRef.current = new window.YT.Player(targetDiv, {
-        videoId,
+        videoId: videoId || undefined,
         host,
-        playerVars: {
-          autoplay: 1,
-          rel: 0,
-        },
+        playerVars,
         events: {
           onError: (event: any) => {
             console.warn('YouTube Player Error:', event.data);
@@ -78,7 +85,7 @@ function YouTubePlayer({ videoId }: { videoId: string }) {
         } catch (e) {}
       }
     };
-  }, [videoId, useFallback]);
+  }, [videoId, listId, useFallback]);
 
   return <div ref={containerRef} style={{ width: '100%', height: '100%' }} />;
 }
@@ -88,12 +95,13 @@ function WatchContent() {
   const router = useRouter();
   
   const videoId = searchParams.get('v');
+  const listId = searchParams.get('list');
   const indexParam = searchParams.get('index');
   const index = indexParam ? parseInt(indexParam, 10) : -1;
   
   const { currentSession } = useSearchStore();
 
-  if (!videoId) {
+  if (!videoId && !listId) {
     return <div className={styles.error}>No video selected</div>;
   }
 
@@ -102,14 +110,20 @@ function WatchContent() {
   const handleNext = () => {
     if (currentSession && index >= 0 && index < currentSession.results.length - 1) {
       const nextVid = currentSession.results[index + 1];
-      router.push(`/watch?v=${nextVid.id}&index=${index + 1}`);
+      const nextUrl = nextVid.itemType === 'playlist' 
+        ? `/watch?list=${nextVid.id}&index=${index + 1}`
+        : `/watch?v=${nextVid.id}&index=${index + 1}`;
+      router.push(nextUrl);
     }
   };
 
   const handlePrev = () => {
     if (currentSession && index > 0) {
       const prevVid = currentSession.results[index - 1];
-      router.push(`/watch?v=${prevVid.id}&index=${index - 1}`);
+      const prevUrl = prevVid.itemType === 'playlist' 
+        ? `/watch?list=${prevVid.id}&index=${index - 1}`
+        : `/watch?v=${prevVid.id}&index=${index - 1}`;
+      router.push(prevUrl);
     }
   };
 
@@ -127,7 +141,7 @@ function WatchContent() {
       </div>
 
       <div className={styles.playerContainer}>
-        <YouTubePlayer videoId={videoId} />
+        <YouTubePlayer videoId={videoId} listId={listId} />
       </div>
 
       <div className={styles.controls}>
