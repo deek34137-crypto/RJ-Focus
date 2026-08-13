@@ -1,0 +1,100 @@
+.main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem 2rem;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.topBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding: 1rem 0;
+}
+
+.backBtn {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  transition: color 0.2s;
+}
+
+.backBtn:hover {
+  color: var(--text-primary);
+}
+
+.sessionInfo {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.sessionInfo strong {
+  color: var(--text-primary);
+}
+
+.playerContainer {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background-color: #000;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 2rem;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+.iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+.controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--surface);
+  padding: 1.5rem;
+  border-radius: 8px;
+}
+
+.videoInfo {
+  text-align: center;
+  flex: 1;
+}
+
+.videoInfo h2 {
+  font-size: 1.2rem;
+  margin-bottom: 0.2rem;
+}
+
+.videoInfo p {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.navBtn {
+  padding: 0.8rem 1.5rem;
+  background-color: var(--surface-elevated);
+  border-radius: 6px;
+  color: var(--text-primary);
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.navBtn:hover:not(:disabled) {
+  background-color: var(--border);
+}
+
+.navBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.error {
+  padding: 4rem;
+  text-align: center;
+  color: var(--danger);
+  font-size: 1.2rem;
+}
