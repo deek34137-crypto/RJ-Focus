@@ -133,13 +133,13 @@ export function rankCandidates(
 
     if (item.itemType === 'video' && duration !== undefined && duration < 600) {
       if (intent.series || intent.contentType === 'One Shot' || intent.exam) {
-        raw_score -= 50;
-        reasons.push('Too short for a full lecture/course (under 10m)');
+        raw_score -= 30;
+        reasons.push('Short duration (under 10m)');
       }
     }
 
     if (item.itemType === 'playlist') {
-      raw_score += 15;
+      raw_score += 5;
       reasons.push('Curated Playlist Format');
     }
 

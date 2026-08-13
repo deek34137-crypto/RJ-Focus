@@ -21,7 +21,7 @@ export async function fetchYouTubeCandidates(query: string): Promise<any[]> {
   searchUrl.searchParams.set('part', 'snippet');
   searchUrl.searchParams.set('q', query);
   searchUrl.searchParams.set('type', 'video,playlist');
-  searchUrl.searchParams.set('maxResults', '25'); // Fetch a good candidate set
+  searchUrl.searchParams.set('maxResults', '50'); // Fetch a larger candidate set to ensure videos are found
   searchUrl.searchParams.set('key', API_KEY);
 
   const searchRes = await fetch(searchUrl.toString(), { next: { revalidate: 3600 } });
