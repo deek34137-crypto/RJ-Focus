@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useSearchStore } from '@/stores/searchStore';
 import SearchResultCard from '@/components/search/SearchResultCard';
@@ -8,7 +8,7 @@ import styles from './search.module.css';
 import { SearchMode } from '@/types';
 import { addSearchToHistory } from '@/lib/storage/history';
 
-export default function SearchPage() {
+function SearchContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const query = searchParams.get('q');
@@ -124,5 +124,13 @@ export default function SearchPage() {
         </div>
       </div>
     </main>
+  );
+}
+
+export default function SearchPage() {
+  return (
+    <Suspense fallback={<div style={{ padding: '2rem', color: 'var(--text-secondary)' }}>Loading search...</div>}>
+      <SearchContent />
+    </Suspense>
   );
 }

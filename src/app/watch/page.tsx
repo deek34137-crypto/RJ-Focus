@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { Suspense, useEffect, useState, useRef } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useSearchStore } from '@/stores/searchStore';
 import styles from './watch.module.css';
@@ -83,7 +83,7 @@ function YouTubePlayer({ videoId }: { videoId: string }) {
   return <div ref={containerRef} style={{ width: '100%', height: '100%' }} />;
 }
 
-export default function WatchPage() {
+function WatchContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   
@@ -153,5 +153,13 @@ export default function WatchPage() {
         </button>
       </div>
     </main>
+  );
+}
+
+export default function WatchPage() {
+  return (
+    <Suspense fallback={<div style={{ padding: '2rem', color: 'var(--text-secondary)' }}>Loading player...</div>}>
+      <WatchContent />
+    </Suspense>
   );
 }

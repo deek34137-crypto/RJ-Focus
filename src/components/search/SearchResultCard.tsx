@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { VideoResult } from '@/types';
-import styles from './search.module.css';
+import styles from '@/app/search/search.module.css';
 import { isBookmarked, addBookmark, removeBookmark } from '@/lib/storage/bookmarks';
 import { Bookmark, BookmarkCheck } from 'lucide-react';
 
