@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Search, X, Clock } from 'lucide-react';
+import { Search, Clock, Settings } from 'lucide-react';
 import styles from './topnav.module.css';
 import { getSearchHistory, removeSearchFromHistory } from '@/lib/storage/history';
 
@@ -52,7 +52,13 @@ export default function TopNav() {
     <nav className={styles.nav}>
       <div className={styles.navLeft}>
         <Link href="/" className={styles.logo}>
-          RJ Focus
+          <div className={styles.logoIcon}>
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2L2 7l10 5 10-5-10-5z" fill="var(--accent)"/>
+              <path d="M2 17l10 5 10-5M2 12l10 5 10-5" stroke="var(--accent)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </div>
+          <span>RJ Focus</span>
         </Link>
       </div>
 
@@ -96,7 +102,9 @@ export default function TopNav() {
       </div>
 
       <div className={styles.navRight}>
-        {/* Placeholder for future auth/settings */}
+        <Link href="/settings" className={styles.iconBtn} aria-label="Settings">
+          <Settings size={22} />
+        </Link>
       </div>
     </nav>
   );

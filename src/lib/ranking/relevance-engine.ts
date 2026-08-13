@@ -161,7 +161,7 @@ export function rankCandidates(
         description: item.snippet.description,
         channelId: item.snippet.channelId,
         channelName: item.snippet.channelTitle,
-        thumbnail: item.snippet.thumbnails?.high?.url || item.snippet.thumbnails?.default?.url,
+        thumbnail: item.snippet.thumbnails?.maxres?.url || item.snippet.thumbnails?.high?.url || item.snippet.thumbnails?.medium?.url || item.snippet.thumbnails?.default?.url,
         duration,
         itemCount,
         publishedAt: item.snippet.publishedAt,

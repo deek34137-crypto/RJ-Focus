@@ -4,6 +4,7 @@ import { Suspense, useEffect, useState, useRef } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { useSearchStore } from '@/stores/searchStore';
 import PlaylistSidebar from '@/components/watch/PlaylistSidebar';
+import { saveResumeProgress, getResumeProgress } from '@/lib/storage/resume';
 import styles from './watch.module.css';
 
 declare global {
@@ -13,9 +14,26 @@ declare global {
   }
 }
 
-function YouTubePlayer({ videoId, listId }: { videoId: string | null, listId: string | null }) {
+interface VideoMeta {
+  videoId: string;
+  title: string;
+  channelName: string;
+  thumbnail: string;
+  duration: number;
+}
+
+function YouTubePlayer({ 
+  videoId, 
+  listId, 
+  videoMeta 
+}: { 
+  videoId: string | null, 
+  listId: string | null,
+  videoMeta?: VideoMeta
+}) {
   const containerRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<any>(null);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const [useFallback, setUseFallback] = useState(false);
 
   useEffect(() => {
@@ -57,10 +75,40 @@ function YouTubePlayer({ videoId, listId }: { videoId: string | null, listId: st
         playerVars.list = listId;
       }
 
+      if (videoId) {
+        const savedTime = getResumeProgress(videoId);
+        if (savedTime > 0) {
+          playerVars.start = Math.floor(savedTime);
+        }
+      }
+
       const playerOptions: any = {
         host,
         playerVars,
         events: {
+          onStateChange: (event: any) => {
+            if (event.data === window.YT.PlayerState.PLAYING) {
+              if (intervalRef.current) clearInterval(intervalRef.current);
+              intervalRef.current = setInterval(() => {
+                if (playerRef.current && videoMeta) {
+                  saveResumeProgress({
+                    ...videoMeta,
+                    currentTime: playerRef.current.getCurrentTime()
+                  });
+                }
+              }, 5000);
+            } else {
+              if (intervalRef.current) {
+                clearInterval(intervalRef.current);
+              }
+              if (playerRef.current && videoMeta) {
+                saveResumeProgress({
+                  ...videoMeta,
+                  currentTime: playerRef.current.getCurrentTime()
+                });
+              }
+            }
+          },
           onError: (event: any) => {
             console.warn('YouTube Player Error:', event.data);
             if (!useFallback) {
@@ -85,13 +133,22 @@ function YouTubePlayer({ videoId, listId }: { videoId: string | null, listId: st
     }
 
     return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
       if (playerRef.current) {
         try {
+          if (videoMeta) {
+            saveResumeProgress({
+              ...videoMeta,
+              currentTime: playerRef.current.getCurrentTime()
+            });
+          }
           playerRef.current.destroy();
         } catch (e) {}
       }
     };
-  }, [videoId, listId, useFallback]);
+  }, [videoId, listId, useFallback, videoMeta]);
 
   return <div ref={containerRef} style={{ width: '100%', height: '100%' }} />;
 }
@@ -139,6 +196,14 @@ function WatchContent() {
     }
   };
 
+  const videoMeta = currentVideo ? {
+    videoId: currentVideo.id,
+    title: currentVideo.title,
+    channelName: currentVideo.channelName,
+    thumbnail: currentVideo.thumbnail,
+    duration: currentVideo.duration || 0,
+  } : undefined;
+
   return (
     <main className={styles.main}>
       <div className={styles.topBar}>
@@ -155,7 +220,7 @@ function WatchContent() {
       <div className={`${styles.contentLayout} ${listId ? styles.withSidebar : ''}`}>
         <div className={styles.mainColumn}>
           <div className={styles.playerContainer}>
-            <YouTubePlayer videoId={videoId} listId={listId} />
+            <YouTubePlayer videoId={videoId} listId={listId} videoMeta={videoMeta} />
           </div>
 
           <div className={styles.controls}>

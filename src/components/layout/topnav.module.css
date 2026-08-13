@@ -19,11 +19,22 @@
 }
 
 .logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   font-weight: 800;
   font-size: 1.25rem;
   letter-spacing: -0.05em;
   color: var(--foreground);
   text-decoration: none;
+}
+
+.logoIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
 }
 
 .navCenter {
@@ -151,4 +162,25 @@
 
 .navRight {
   flex: 1;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.iconBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  color: var(--text-secondary);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.iconBtn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--foreground);
 }

@@ -33,7 +33,7 @@ export async function GET(request: Request) {
       id: item.contentDetails.videoId,
       title: item.snippet.title,
       description: item.snippet.description,
-      thumbnail: item.snippet.thumbnails?.medium?.url || item.snippet.thumbnails?.default?.url || '',
+      thumbnail: item.snippet.thumbnails?.maxres?.url || item.snippet.thumbnails?.high?.url || item.snippet.thumbnails?.medium?.url || item.snippet.thumbnails?.default?.url || '',
       channelName: item.snippet.videoOwnerChannelTitle,
       position: item.snippet.position,
     })).filter((item: any) => item.title !== 'Private video' && item.title !== 'Deleted video');
