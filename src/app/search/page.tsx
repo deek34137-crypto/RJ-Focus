@@ -60,22 +60,6 @@ function SearchContent() {
 
   return (
     <main className={styles.main}>
-      <header className={styles.header}>
-        <div className={styles.headerTop}>
-          <h1 className={styles.logo} onClick={() => router.push('/')}>RJ Focus</h1>
-          <form onSubmit={handleSearch} className={styles.searchContainer}>
-            <input 
-              type="text" 
-              value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-              placeholder="Search..." 
-              className={styles.searchInput}
-            />
-            <button type="submit" className={styles.searchBtn}>Search</button>
-          </form>
-        </div>
-      </header>
-
       <div className={styles.content}>
         <div className={styles.sidebar}>
           <div className={styles.modes}>

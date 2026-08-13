@@ -1,5 +1,6 @@
 import '../styles/globals.css';
 import type { Metadata } from 'next';
+import TopNav from '@/components/layout/TopNav';
 
 export const metadata: Metadata = {
   title: 'RJ Focus',
@@ -13,7 +14,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <TopNav />
+        {children}
+      </body>
     </html>
   );
 }
