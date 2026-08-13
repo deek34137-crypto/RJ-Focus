@@ -63,7 +63,7 @@ function SearchContent() {
       <header className={styles.header}>
         <div className={styles.headerTop}>
           <h1 className={styles.logo} onClick={() => router.push('/')}>RJ Focus</h1>
-          <form onSubmit={handleSearch} className={styles.searchForm}>
+          <form onSubmit={handleSearch} className={styles.searchContainer}>
             <input 
               type="text" 
               value={searchInput}
@@ -71,18 +71,19 @@ function SearchContent() {
               placeholder="Search..." 
               className={styles.searchInput}
             />
+            <button type="submit" className={styles.searchBtn}>Search</button>
           </form>
         </div>
       </header>
 
       <div className={styles.content}>
-        <div className={styles.filters}>
-          <div className={styles.modeSelector}>
+        <div className={styles.sidebar}>
+          <div className={styles.modes}>
             {(['STRICT', 'BALANCED', 'DISCOVERY'] as SearchMode[]).map(m => (
               <button 
                 key={m}
                 onClick={() => setMode(m)}
-                className={`${styles.modeBtn} ${mode === m ? styles.active : ''}`}
+                className={`${styles.modeBtn} ${mode === m ? styles.activeMode : ''}`}
               >
                 {m}
               </button>
@@ -90,11 +91,11 @@ function SearchContent() {
           </div>
 
           {currentSession?.intent && Object.keys(currentSession.intent).length > 0 && (
-            <div className={styles.detectedIntent}>
-              <h4>Detected Intent</h4>
-              <div className={styles.tags}>
+            <div className={styles.intentSection}>
+              <h3>Detected Intent</h3>
+              <div className={styles.intentTags}>
                 {Object.entries(currentSession.intent).map(([key, val]) => (
-                  <span key={key} className={styles.tag}>{val}</span>
+                  <span key={key} className={styles.intentTag}>{val as React.ReactNode}</span>
                 ))}
               </div>
             </div>
@@ -107,7 +108,7 @@ function SearchContent() {
           {error && <div className={styles.error}>{error}</div>}
 
           {!loading && !error && currentSession?.results.length === 0 && (
-            <div className={styles.noResults}>
+            <div className={styles.empty}>
               <h2>No highly relevant videos found.</h2>
               <p>Try switching to Balanced mode or modify your search.</p>
             </div>

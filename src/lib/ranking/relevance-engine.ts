@@ -1,9 +1,9 @@
 import { ParsedIntent, SearchMode, VideoResult } from '@/types';
 
 const THRESHOLDS = {
-  STRICT: 70,
-  BALANCED: 40,
-  DISCOVERY: 15,
+  STRICT: 80,
+  BALANCED: 50,
+  DISCOVERY: 20,
 };
 
 function parseDuration(duration: string): number {
@@ -22,8 +22,17 @@ export function rankCandidates(
 ): VideoResult[] {
   const results: VideoResult[] = [];
 
+  let max_score = 0;
+  if (intent.organization) max_score += 20;
+  if (intent.series) max_score += 25;
+  if (intent.subject) max_score += 15;
+  if (intent.class) max_score += 10;
+  if (intent.topic) max_score += 20;
+  if (intent.exam) max_score += 10;
+  if (intent.contentType === 'One Shot') max_score += 15;
+
   for (const item of youtubeItems) {
-    let score = 0;
+    let raw_score = 0;
     const reasons: string[] = [];
     const title = item.snippet.title.toLowerCase();
     const channel = item.snippet.channelTitle.toLowerCase();
@@ -33,35 +42,34 @@ export function rankCandidates(
 
     if (intent.organization) {
       if (channel.includes(intent.organization.toLowerCase()) || title.includes(intent.organization.toLowerCase())) {
-        score += 20;
+        raw_score += 20;
         reasons.push(`Organization Match: ${intent.organization}`);
       }
     }
 
     if (intent.series) {
       if (title.includes(intent.series.toLowerCase())) {
-        score += 25;
+        raw_score += 25;
         reasons.push(`Series Match: ${intent.series}`);
       } else if (desc.includes(intent.series.toLowerCase())) {
-        score += 10;
+        raw_score += 10;
         reasons.push(`Series mentioned: ${intent.series}`);
       }
     }
 
     if (intent.subject) {
       if (title.includes(intent.subject.toLowerCase())) {
-        score += 15;
+        raw_score += 15;
         reasons.push(`Subject Match: ${intent.subject}`);
       }
     }
 
     if (intent.class) {
-      // E.g., 'Class 12'
       const numMatch = intent.class.match(/(\d+)/);
       if (numMatch) {
         const num = numMatch[1];
         if (title.includes(`class ${num}`) || title.includes(`${num}th`)) {
-          score += 10;
+          raw_score += 10;
           reasons.push(`Class Match: ${intent.class}`);
         }
       }
@@ -69,20 +77,20 @@ export function rankCandidates(
 
     if (intent.topic) {
       if (title.includes(intent.topic.toLowerCase())) {
-        score += 20;
+        raw_score += 20;
         reasons.push(`Topic Match: ${intent.topic}`);
       }
     }
 
     if (intent.exam) {
       if (title.includes(intent.exam.toLowerCase()) || channel.includes(intent.exam.toLowerCase())) {
-        score += 10;
+        raw_score += 10;
         reasons.push(`Exam Match: ${intent.exam}`);
       }
     }
 
     if (intent.contentType === 'One Shot' && title.includes('one shot')) {
-      score += 15;
+      raw_score += 15;
       reasons.push(`Content Type Match: One Shot`);
     }
 
@@ -93,7 +101,7 @@ export function rankCandidates(
     if (intent.subject) {
       for (const subj of subjects) {
         if (subj !== intent.subject.toLowerCase() && title.includes(subj)) {
-          score -= 40;
+          raw_score -= 40;
           reasons.push(`Contradicts Subject: Contains ${subj}`);
         }
       }
@@ -107,21 +115,24 @@ export function rankCandidates(
         const num = numMatch[1];
         for (const cls of classes) {
           if (cls !== num && (title.includes(`class ${cls}`) || title.includes(`${cls}th`))) {
-            score -= 30;
+            raw_score -= 30;
             reasons.push(`Contradicts Class: Contains Class ${cls}`);
           }
         }
       }
     }
 
-    // Normalize to 0-100 roughly
-    score = Math.max(0, Math.min(100, score));
+    let percentage = 0;
+    if (max_score === 0) {
+      // Unrecognized query
+      percentage = raw_score < 0 ? 0 : 100;
+    } else {
+      percentage = Math.max(0, Math.round((raw_score / max_score) * 100));
+    }
 
-    // Hard filter: if we have negative signals that dropped score to 0 or very low, it will be naturally filtered out by threshold
-    // Threshold filtering
     const threshold = THRESHOLDS[mode] || THRESHOLDS.STRICT;
 
-    if (score >= threshold) {
+    if (percentage >= threshold) {
       results.push({
         id: item.id,
         title: item.snippet.title,
@@ -131,7 +142,7 @@ export function rankCandidates(
         thumbnail: item.snippet.thumbnails?.high?.url || item.snippet.thumbnails?.default?.url,
         duration: parseDuration(item.contentDetails.duration),
         publishedAt: item.snippet.publishedAt,
-        relevanceScore: score,
+        relevanceScore: percentage,
         relevanceReasons: reasons,
       });
     }
