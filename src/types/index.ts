@@ -14,14 +14,15 @@ export type ParsedIntent = {
 
 export type VideoResult = {
   id: string;
+  itemType: 'video' | 'playlist';
   title: string;
   description: string;
   channelId: string;
   channelName: string;
   thumbnail: string;
-  duration: number; // in seconds
+  duration?: number; // in seconds, undefined for playlists
+  itemCount?: number; // number of videos, undefined for videos
   publishedAt: string;
-  playlistId?: string;
   relevanceScore: number;
   relevanceReasons: string[];
 };

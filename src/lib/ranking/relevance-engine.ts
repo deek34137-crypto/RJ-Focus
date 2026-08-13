@@ -122,6 +122,27 @@ export function rankCandidates(
       }
     }
 
+    // -- DURATION & PLAYLIST MODIFIERS --
+    const duration = item.itemType === 'video' && item.contentDetails?.duration 
+      ? parseDuration(item.contentDetails.duration) 
+      : undefined;
+      
+    const itemCount = item.itemType === 'playlist' && item.contentDetails?.itemCount
+      ? item.contentDetails.itemCount
+      : undefined;
+
+    if (item.itemType === 'video' && duration !== undefined && duration < 600) {
+      if (intent.series || intent.contentType === 'One Shot' || intent.exam) {
+        raw_score -= 50;
+        reasons.push('Too short for a full lecture/course (under 10m)');
+      }
+    }
+
+    if (item.itemType === 'playlist') {
+      raw_score += 15;
+      reasons.push('Curated Playlist Format');
+    }
+
     let percentage = 0;
     if (max_score === 0) {
       // Unrecognized query
@@ -135,12 +156,14 @@ export function rankCandidates(
     if (percentage >= threshold) {
       results.push({
         id: item.id,
+        itemType: item.itemType || 'video',
         title: item.snippet.title,
         description: item.snippet.description,
         channelId: item.snippet.channelId,
         channelName: item.snippet.channelTitle,
         thumbnail: item.snippet.thumbnails?.high?.url || item.snippet.thumbnails?.default?.url,
-        duration: parseDuration(item.contentDetails.duration),
+        duration,
+        itemCount,
         publishedAt: item.snippet.publishedAt,
         relevanceScore: percentage,
         relevanceReasons: reasons,
